@@ -1,0 +1,12 @@
+parameters:
+  containerRegistry: ""
+  repoName: ""
+  projectName: ""
+
+variables:
+  projectName: ${{ parameters.projectName }}
+  imageTag: $(Build.BuildNumber)
+  repositoryName: ${{ parameters.projectName }}
+  helmChartVersion: $(Build.BuildNumber)
+  registry: ${{ parameters.containerRegistry }}
+  serviceConnection: "svc-eks-deploy"

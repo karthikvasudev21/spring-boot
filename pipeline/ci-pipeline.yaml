@@ -1,0 +1,10 @@
+pool:
+  name: self
+variables:
+  - template: ci-vars.yaml
+    parameters:
+      containerRegistry: "716107848499.dkr.ecr.eu-west-1.amazonaws.com"
+      repoName: "spring-boot"
+      projectName: "spring-boot"
+steps:
+  - template: ci-steps.yaml

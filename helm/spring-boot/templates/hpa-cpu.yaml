@@ -1,0 +1,17 @@
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.app.name }}-cpu-hpa
+  namespace: ns-app
+spec:
+  maxReplicas: 3
+  minReplicas: {{ .Values.replicaCount }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.app.name }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageValue: {{ .Values.cpu.target }}

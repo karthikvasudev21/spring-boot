@@ -1,0 +1,45 @@
+steps:
+
+  - task: Maven@3
+    inputs:
+      mavenPomFile: '$(System.DefaultWorkingDirectory)/spring-boot-web/pom.xml'
+      goals: 'clean install package'
+      options: ' -U -DskipTests'
+      mavenFeedAuthenticate: true
+
+  - task: Docker@2
+    inputs:
+      displayName: 'Build Docker image'
+      repository: '$(projectName)'
+      command: build
+      Dockerfile: 'Dockerfile'
+      tags: $(imageTag)
+      buildContext: '$(System.DefaultWorkingDirectory)'
+
+  - task: AmazonWebServices.aws-vsts-tools.ECRPushImage.ECRPushImage@1
+    displayName: 'Push Image: '
+    inputs:
+      awsCredentials: 'svc-eks-deploy'
+      regionName: 'eu-west-1'
+      sourceImageName: 'spring-boot'
+      sourceImageTag: $(imageTag)
+      repositoryName: 'spring-boot'
+      pushTag: $(Build.BuildNumber)
+
+  - task: HelmInstaller@1
+    displayName: "install helm without tiller"
+    inputs:
+      helmVersionToInstall: 'latest'
+
+  - bash: |
+      cd helm
+      export HELM_EXPERIMENTAL_OCI=1
+      aws ecr get-login-password --region eu-west-1 | helm registry login --username AWS --password-stdin 716107848499.dkr.ecr.eu-west-1.amazonaws.com
+      echo $(jq -n --arg version "$(helmChartVersion)" '{helmChartVersion: $version}') > $(build.artifactStagingDirectory)/variables.json
+      helm package ./$(projectName)
+      helm chart save ./$(projectName) $(registry)/charts:$(Build.BuildNumber)
+      helm chart push $(registry)/charts:$(Build.BuildNumber)
+    displayName: "Helm package and push to ECR repo"
+
+  - publish: $(build.artifactStagingDirectory)
+    artifact: $(projectName)

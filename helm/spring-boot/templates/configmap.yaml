@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.app.name }}-configmap
+data:
+  start.sh: |
+    #!/bin/sh
+    export BASIC_AUTH_USERNAME=$(cat /mnt/secrets-store/BASIC-AUTH-USERNAME)
+    export BASIC_AUTH_PASSWORD=$(cat /mnt/secrets-store/BASIC-AUTH-PASSWORD)
+    java -Dlogging.path=$LOG_PATH -Xms512m -Xmx512m -XX:MaxNewSize=200m -XX:+UseConcMarkSweepGC -server -XX:+TieredCompilation -jar /app.jar
