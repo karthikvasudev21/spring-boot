@@ -20,7 +20,6 @@ public class WelcomeController {
 	public String welcome(Map<String, Object> model) {
 		model.put("title", TITLE);
 		model.put("message", MESSAGE);
-		model.put("secret", SECRET);
 		return "welcome";
 	}
 
