@@ -30,20 +30,11 @@ spec:
               cpu: 200m
               memory: 300Mi
           volumeMounts:
-            - name: secrets-store-inline
-              mountPath: /mnt/secrets-store
-              readOnly: true
             - name: config-volume
               mountPath: /script/start.sh
               subPath: start.sh
 
       volumes:
-        - name: secrets-store-inline
-          csi:
-            driver: secrets-store.csi.k8s.io
-            readOnly: true
-            volumeAttributes:
-              secretProviderClass: "aws-secrets"
         - name: config-volume
           configMap:
             name: {{ .Values.app.name }}-configmap
