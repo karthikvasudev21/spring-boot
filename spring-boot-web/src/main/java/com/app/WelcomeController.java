@@ -16,9 +16,6 @@ public class WelcomeController {
 	@Value("${app.welcome.title}")
 	private String TITLE = "SPRING-BOOT-DEMO";
 
-	@Value("${app.secret}")
-	private String SECRET = "";
-
 	@RequestMapping("/")
 	public String welcome(Map<String, Object> model) {
 		model.put("title", TITLE);
